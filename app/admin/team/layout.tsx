@@ -1,9 +1,5 @@
 export default function TeamLayout({
-    children,
+  children
 }: Readonly<{ children: React.ReactNode }>) {
-    return (
-        <>
-            {children}
-        </>
-    )
+  return <>{children}</>;
 }

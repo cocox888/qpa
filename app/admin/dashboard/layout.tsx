@@ -1,12 +1,8 @@
-"use client"
-import React from "react";
+'use client';
+import type React from 'react';
 
 export default function DashboardLayout({
-    children,
+  children
 }: Readonly<{ children: React.ReactNode }>) {
-    return (
-        <>
-            {children}
-        </>
-    )
+  return <>{children}</>;
 }

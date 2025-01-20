@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 
 export interface Item {
   id: number;
@@ -9,7 +9,6 @@ export interface Item {
   projects: number;
   tasks: { completed: number; total: number };
 }
-
 
 interface MemberCard2Props {
   member: Item;
@@ -35,16 +34,14 @@ const MemberCard2: React.FC<MemberCard2Props> = ({ member }) => {
             <div className="flex items-center gap-1">
               <span
                 className={`${
-                  status == "online"
-                    ? "bg-green-500 "
-                    : status == "away"
-                    ? "bg-yellow-500"
-                    : "bg-gray-400 "
+                  status == 'online'
+                    ? 'bg-green-500 '
+                    : status == 'away'
+                    ? 'bg-yellow-500'
+                    : 'bg-gray-400 '
                 } w-2 h-2 rounded-full`}
               ></span>
-              <span className="text-xs text-gray-500 capitalize">
-                {status}
-              </span>
+              <span className="text-xs text-gray-500 capitalize">{status}</span>
             </div>
           </div>
           <div className="mt-4 flex items-center justify-between">

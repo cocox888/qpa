@@ -1,12 +1,5 @@
 import type { Metadata } from 'next';
-// import { Inter } from "next/font/google";
 import './globals.css';
-import ClientWrapper from '@/components/common/ClientWrapper';
-
-// const inter = Inter({
-//   variable: "--font-inter",
-//   subsets: ["latin"],
-// });
 
 export const metadata: Metadata = {
   title: 'QPA',
@@ -16,20 +9,13 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="en">
-      <head>
-        {/* <script src="/js/scripts.js" defer></script>
-        <script src="/js/projectdetails.js" defer></script> */}
-      </head>
-      <body className={`antialiased`}>
-        <ClientWrapper>
-          {children}
-        </ClientWrapper>
-      </body>
+      <head />
+      <body className="antialiased">{children}</body>
     </html>
   );
 }

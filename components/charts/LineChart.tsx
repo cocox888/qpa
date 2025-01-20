@@ -1,4 +1,4 @@
-import React from "react";
+import type React from 'react';
 import {
   AreaChart,
   Area,
@@ -6,19 +6,18 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  ResponsiveContainer,
-
-} from "recharts";
+  ResponsiveContainer
+} from 'recharts';
 
 // Sample data with more realistic values
 const data = [
-  { name: "Week 1", revenue: 31000, users: 2400 },
-  { name: "Week 2", revenue: 28000, users: 1398 },
-  { name: "Week 3", revenue: 35000, users: 9800 },
-  { name: "Week 4", revenue: 42000, users: 3908 },
-  { name: "Week 5", revenue: 38000, users: 4800 },
-  { name: "Week 6", revenue: 45000, users: 3800 },
-  { name: "Week 7", revenue: 50000, users: 4300 },
+  { name: 'Week 1', revenue: 31000, users: 2400 },
+  { name: 'Week 2', revenue: 28000, users: 1398 },
+  { name: 'Week 3', revenue: 35000, users: 9800 },
+  { name: 'Week 4', revenue: 42000, users: 3908 },
+  { name: 'Week 5', revenue: 38000, users: 4800 },
+  { name: 'Week 6', revenue: 45000, users: 3800 },
+  { name: 'Week 7', revenue: 50000, users: 4300 }
 ];
 
 // Define the type for each payload item
@@ -78,7 +77,10 @@ const data = [
 const ActivityChart: React.FC = () => {
   return (
     <ResponsiveContainer width="100%" height={300}>
-      <AreaChart data={data} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+      <AreaChart
+        data={data}
+        margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+      >
         <CartesianGrid
           strokeDasharray="3 3"
           vertical={false}
@@ -88,12 +90,12 @@ const ActivityChart: React.FC = () => {
           dataKey="name"
           axisLine={false}
           tickLine={false}
-          tick={{ fill: "#9CA3AF", fontSize: 12 }}
+          tick={{ fill: '#9CA3AF', fontSize: 12 }}
         />
         <YAxis
           axisLine={false}
           tickLine={false}
-          tick={{ fill: "#9CA3AF", fontSize: 12 }}
+          tick={{ fill: '#9CA3AF', fontSize: 12 }}
           tickFormatter={(value) => `$${value.toLocaleString()}`}
         />
         <Tooltip />

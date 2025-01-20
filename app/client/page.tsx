@@ -1,8 +1,9 @@
 'use client';
-import React, { useState, ChangeEvent, useEffect, useRef } from 'react';
+import type React from 'react';
+import { useState, type ChangeEvent, useEffect, useRef } from 'react';
 import { ChevronRight, CheckCircle, Clock, Users } from 'lucide-react';
 import Image from 'next/image';
-import timezones from "timezones-list"; // Add this import
+import timezones from 'timezones-list'; // Add this import
 
 type FormData = {
   // Section 1: Client Information
@@ -122,7 +123,6 @@ const OnboardingFlow = () => {
   const handleInputChange = (
     e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
   ) => {
-
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
@@ -146,7 +146,6 @@ const OnboardingFlow = () => {
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
     >
   ) => {
-
     e.target.focus();
   };
 
@@ -166,9 +165,8 @@ const OnboardingFlow = () => {
 
             <div className="space-y-4">
               <div>
-                <label className="block text-gray-700 mb-2">Full Name*</label>
+                <div className="block text-gray-700 mb-2">Full Name*</div>
                 <input
-               
                   type="text"
                   name="fullName"
                   value={formData.fullName}
@@ -181,9 +179,7 @@ const OnboardingFlow = () => {
               </div>
 
               <div>
-                <label className="block text-gray-700 mb-2">
-                  Business Name
-                </label>
+                <div className="block text-gray-700 mb-2">Business Name</div>
                 <input
                   type="text"
                   name="businessName"
@@ -197,9 +193,9 @@ const OnboardingFlow = () => {
 
               {/* Add both address fields */}
               <div>
-                <label className="block text-gray-700 mb-2">
+                <div className="block text-gray-700 mb-2">
                   Personal Address*
-                </label>
+                </div>
                 <input
                   type="text"
                   name="personalAddress"
@@ -213,9 +209,7 @@ const OnboardingFlow = () => {
               </div>
 
               <div>
-                <label className="block text-gray-700 mb-2">
-                  Business Address
-                </label>
+                <div className="block text-gray-700 mb-2">Business Address</div>
                 <input
                   type="text"
                   name="businessAddress"
@@ -228,9 +222,7 @@ const OnboardingFlow = () => {
               </div>
 
               <div>
-                <label className="block text-gray-700 mb-2">
-                  Position/Title*
-                </label>
+                <div className="block text-gray-700 mb-2">Position/Title*</div>
                 <input
                   type="text"
                   name="position"
@@ -243,9 +235,7 @@ const OnboardingFlow = () => {
               </div>
 
               <div>
-                <label className="block text-gray-700 mb-2">
-                  Email Address*
-                </label>
+                <div className="block text-gray-700 mb-2">Email Address*</div>
                 <input
                   type="email"
                   name="email"
@@ -258,9 +248,7 @@ const OnboardingFlow = () => {
               </div>
 
               <div>
-                <label className="block text-gray-700 mb-2">
-                  Phone Number*
-                </label>
+                <div className="block text-gray-700 mb-2">Phone Number*</div>
                 <input
                   type="tel"
                   name="phone"
@@ -273,9 +261,9 @@ const OnboardingFlow = () => {
               </div>
 
               <div>
-                <label className="block text-gray-700 mb-2">
+                <div className="block text-gray-700 mb-2">
                   Preferred Contact Method
-                </label>
+                </div>
                 <select
                   name="preferredContact"
                   value={formData.preferredContact}
@@ -292,9 +280,9 @@ const OnboardingFlow = () => {
 
               {formData.preferredContact === 'Messaging' && (
                 <div>
-                  <label className="block text-gray-700 mb-2">
+                  <div className="block text-gray-700 mb-2">
                     Specify Messaging App
-                  </label>
+                  </div>
                   <input
                     type="text"
                     name="messagingApp"
@@ -308,7 +296,7 @@ const OnboardingFlow = () => {
               )}
 
               <div>
-                <label className="block text-gray-700 mb-2">Timezone*</label>
+                <div className="block text-gray-700 mb-2">Timezone*</div>
                 <select
                   name="timezone"
                   value={formData.timezone}
@@ -342,9 +330,9 @@ const OnboardingFlow = () => {
 
             <div className="space-y-4">
               <div>
-                <label className="block text-gray-700 mb-2 font-semibold">
+                <div className="block text-gray-700 mb-2 font-semibold">
                   Which services do you require? (Check all that apply)
-                </label>
+                </div>
                 <div className="space-y-2">
                   {[
                     'Virtual Assistant (Personal / Lifestyle)',
@@ -357,10 +345,7 @@ const OnboardingFlow = () => {
                     'Website Creation / Management',
                     'Event Planning / Coordination'
                   ].map((service) => (
-                    <label
-                      key={service}
-                      className="flex items-center space-x-2"
-                    >
+                    <div key={service} className="flex items-center space-x-2">
                       <input
                         type="checkbox"
                         name={service}
@@ -369,15 +354,15 @@ const OnboardingFlow = () => {
                         className="rounded text-[#84b894] focus:ring-[#84b894]"
                       />
                       <span className="text-gray-700">{service}</span>
-                    </label>
+                    </div>
                   ))}
                 </div>
               </div>
 
               <div>
-                <label className="block text-gray-700 mb-2 font-bold">
+                <div className="block text-gray-700 mb-2 font-bold">
                   Other (please specify)
-                </label>
+                </div>
                 <input
                   type="text"
                   name="otherServices"
@@ -390,10 +375,10 @@ const OnboardingFlow = () => {
               </div>
 
               <div>
-                <label className="block text-gray-700 mb-2 font-semibold">
+                <div className="block text-gray-700 mb-2 font-semibold">
                   Do you have any upcoming deadlines or priorities we should be
                   aware of?
-                </label>
+                </div>
                 <textarea
                   name="deadlines"
                   value={formData.deadlines}
@@ -406,10 +391,10 @@ const OnboardingFlow = () => {
               </div>
 
               <div>
-                <label className="block text-gray-700 mb-2 font-semibold">
+                <div className="block text-gray-700 mb-2 font-semibold">
                   How many hours per week or month do you anticipate needing
                   support?
-                </label>
+                </div>
                 <input
                   type="text"
                   name="hoursNeeded"
@@ -438,10 +423,10 @@ const OnboardingFlow = () => {
 
             <div className="space-y-4">
               <div>
-                <label className="block text-gray-700 mb-2 font-semibold">
+                <div className="block text-gray-700 mb-2 font-semibold">
                   What tools/software/platforms do you currently use? (e.g.,
                   Google Workspace, Slack, Asana, Canva, etc.)
-                </label>
+                </div>
                 <input
                   type="text"
                   name="currentTools"
@@ -454,9 +439,9 @@ const OnboardingFlow = () => {
               </div>
 
               <div>
-                <label className="block text-gray-700 mb-2 font-semibold">
+                <div className="block text-gray-700 mb-2 font-semibold">
                   Do we need access to any specific tools or accounts?
-                </label>
+                </div>
                 <select
                   name="needAccess"
                   value={formData.needAccess}
@@ -470,9 +455,9 @@ const OnboardingFlow = () => {
               </div>
 
               <div>
-                <label className="block text-gray-700 mb-2 font-semibold">
+                <div className="block text-gray-700 mb-2 font-semibold">
                   What is your preferred file-sharing method?
-                </label>
+                </div>
                 <select
                   name="fileSharing"
                   value={formData.fileSharing}
@@ -490,9 +475,9 @@ const OnboardingFlow = () => {
 
               {formData.needAccess === 'yes' && (
                 <div>
-                  <label className="block text-gray-700 mb-2">
+                  <div className="block text-gray-700 mb-2">
                     Specify Required Access
-                  </label>
+                  </div>
                   <textarea
                     name="toolsSpecify"
                     value={formData.toolsSpecify}
@@ -522,9 +507,9 @@ const OnboardingFlow = () => {
 
             <div className="space-y-4">
               <div>
-                <label className="block text-gray-700 mb-2 font-semibold">
+                <div className="block text-gray-700 mb-2 font-semibold">
                   How often would you like updates or check-ins?
-                </label>
+                </div>
                 <select
                   name="updateFrequency"
                   value={formData.updateFrequency}
@@ -540,9 +525,9 @@ const OnboardingFlow = () => {
               </div>
 
               <div>
-                <label className="block text-gray-700 mb-2 font-semibold">
+                <div className="block text-gray-700 mb-2 font-semibold">
                   What is your preferred method for receiving updates?
-                </label>
+                </div>
                 <select
                   name="updateMethod"
                   value={formData.updateMethod}
@@ -561,10 +546,10 @@ const OnboardingFlow = () => {
               </div>
 
               <div>
-                <label className="block text-gray-700 mb-2 font-semibold">
+                <div className="block text-gray-700 mb-2 font-semibold">
                   Who are the key stakeholders / team members we should keep in
                   the loop?
-                </label>
+                </div>
                 <textarea
                   name="stakeholders"
                   value={formData.stakeholders}
@@ -584,10 +569,10 @@ const OnboardingFlow = () => {
           <div className="space-y-6">
             <div>
               <div>
-                <label className="block text-gray-700 mb-2 font-semibold">
+                <div className="block text-gray-700 mb-2 font-semibold">
                   Are there any particular tasks you would like us to
                   prioritize?
-                </label>
+                </div>
                 <textarea
                   name="priorities"
                   value={formData.priorities}
@@ -599,9 +584,9 @@ const OnboardingFlow = () => {
               </div>
 
               <div>
-                <label className="block text-gray-700 mb-2 font-semibold">
+                <div className="block text-gray-700 mb-2 font-semibold">
                   What is your onboarding timeline or ideal start date?
-                </label>
+                </div>
                 <input
                   type="date"
                   name="startDate"
@@ -628,9 +613,9 @@ const OnboardingFlow = () => {
 
             <div className="space-y-4">
               <div>
-                <label className="block text-gray-700 mb-2 font-semibold">
+                <div className="block text-gray-700 mb-2 font-semibold">
                   Preferred Billing Method
-                </label>
+                </div>
                 <select
                   name="billingMethod"
                   value={formData.billingMethod}
@@ -644,9 +629,9 @@ const OnboardingFlow = () => {
               </div>
 
               <div>
-                <label className="block text-gray-700 mb-2 font-semibold">
+                <div className="block text-gray-700 mb-2 font-semibold">
                   Billing Cycle Preference
-                </label>
+                </div>
                 <select
                   name="billingCycle"
                   value={formData.billingCycle}
@@ -660,9 +645,9 @@ const OnboardingFlow = () => {
               </div>
 
               <div>
-                <label className="block text-gray-700 mb-2 font-semibold">
+                <div className="block text-gray-700 mb-2 font-semibold">
                   Invoice Email Address (if different from above)
-                </label>
+                </div>
                 <input
                   type="email"
                   name="billingEmail"
@@ -691,9 +676,9 @@ const OnboardingFlow = () => {
 
             <div className="space-y-4">
               <div>
-                <label className="block text-gray-700 mb-2 font-semibold">
+                <div className="block text-gray-700 mb-2 font-semibold">
                   Emergency Contact Name
-                </label>
+                </div>
                 <input
                   type="text"
                   name="emergencyName"
@@ -705,9 +690,9 @@ const OnboardingFlow = () => {
               </div>
 
               <div>
-                <label className="block text-gray-700 mb-2 font-semibold">
+                <div className="block text-gray-700 mb-2 font-semibold">
                   Emergency Contact Phone
-                </label>
+                </div>
                 <input
                   type="tel"
                   name="emergencyPhone"
@@ -719,9 +704,9 @@ const OnboardingFlow = () => {
               </div>
 
               <div>
-                <label className="block text-gray-700 mb-2 font-semibold">
+                <div className="block text-gray-700 mb-2 font-semibold">
                   Relationship to You/Your Business
-                </label>
+                </div>
                 <input
                   type="text"
                   name="emergencyRelation"
@@ -745,9 +730,9 @@ const OnboardingFlow = () => {
 
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-gray-700 mb-2 font-semibold">
+                    <div className="block text-gray-700 mb-2 font-semibold">
                       Digital Signature (Type Full Name)*
-                    </label>
+                    </div>
                     <input
                       type="text"
                       name="signature"
@@ -760,9 +745,9 @@ const OnboardingFlow = () => {
                   </div>
 
                   <div>
-                    <label className="block text-gray-700 mb-2 font-semibold">
+                    <div className="block text-gray-700 mb-2 font-semibold">
                       Date*
-                    </label>
+                    </div>
                     <input
                       type="date"
                       name="date"
@@ -900,6 +885,7 @@ const OnboardingFlow = () => {
           </div>
 
           <div className="space-y-4">
+            {/* biome-ignore lint/a11y/useButtonType: <explanation> */}
             <button
               onClick={() => setShowForm(true)}
               className="w-full bg-[#84b894] text-white py-3 rounded-lg hover:bg-[#6a9377] transition-colors flex items-center justify-center gap-2"
@@ -1011,6 +997,7 @@ const OnboardingFlow = () => {
               <FormSection step={currentStep} />
 
               <div className="flex justify-between mt-8 mb-8">
+                {/* biome-ignore lint/a11y/useButtonType: <explanation> */}
                 <button
                   onClick={() =>
                     currentStep === 1
@@ -1022,6 +1009,7 @@ const OnboardingFlow = () => {
                   {currentStep === 1 ? 'Back' : 'Previous'}
                 </button>
 
+                {/* biome-ignore lint/a11y/useButtonType: <explanation> */}
                 <button
                   onClick={() => {
                     if (currentStep === totalSteps) {

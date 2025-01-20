@@ -1,9 +1,5 @@
 export default function KanbanLayout({
-    children,
+  children
 }: Readonly<{ children: React.ReactNode }>) {
-    return (
-        <>
-            {children}
-        </>
-    )
+  return <>{children}</>;
 }

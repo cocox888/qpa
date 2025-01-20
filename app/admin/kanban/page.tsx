@@ -1,8 +1,8 @@
-"use client";
-import React, { useState, DragEvent, useRef } from "react";
-import Image from "next/image";
-import StatsGrid from "@/components/StatsGrid";
-
+'use client';
+import type React from 'react';
+import { useState, type DragEvent, useRef } from 'react';
+import Image from 'next/image';
+import StatsGrid from '@/components/StatsGrid';
 
 interface SubTask {
   id: string;
@@ -36,7 +36,7 @@ interface Task {
   id: string;
   title: string;
   description: string;
-  priority?: "high" | "normal" | "low";
+  priority?: 'high' | 'normal' | 'low';
   dueDate?: string;
   assignees?: string[];
   labels?: string[];
@@ -69,79 +69,79 @@ interface Column {
 const KanbanBoard: React.FC = () => {
   const [columns, setColumns] = useState<Column[]>([
     {
-      id: "todo",
-      title: "To Do",
-      color: "gray",
+      id: 'todo',
+      title: 'To Do',
+      color: 'gray',
       tasks: [
         {
-          id: "t1",
-          title: "API Authentication Bug",
-          description: "Fix user session timeout issues in production",
-          priority: "high",
-          dueDate: "Due Today",
-          assignees: ["user1", "user2"],
-          labels: ["High Priority"],
+          id: 't1',
+          title: 'API Authentication Bug',
+          description: 'Fix user session timeout issues in production',
+          priority: 'high',
+          dueDate: 'Due Today',
+          assignees: ['user1', 'user2'],
+          labels: ['High Priority']
         },
         {
-          id: "t2",
-          title: "Dashboard Redesign",
-          description: "Update analytics dashboard with new metrics",
-          priority: "normal",
-          dueDate: "Dec 28",
-          assignees: ["user1"],
-          labels: ["Design", "Frontend"],
-        },
+          id: 't2',
+          title: 'Dashboard Redesign',
+          description: 'Update analytics dashboard with new metrics',
+          priority: 'normal',
+          dueDate: 'Dec 28',
+          assignees: ['user1'],
+          labels: ['Design', 'Frontend']
+        }
       ],
-      order: 0,
+      order: 0
     },
     {
-      id: "in-progress",
-      title: "In Progress",
-      color: "blue",
+      id: 'in-progress',
+      title: 'In Progress',
+      color: 'blue',
       tasks: [
         {
-          id: "t3",
-          title: "Payment Integration",
-          description: "Implement Stripe payment gateway",
+          id: 't3',
+          title: 'Payment Integration',
+          description: 'Implement Stripe payment gateway',
           progress: 65,
-          dueDate: "Dec 25",
-          assignees: ["user1", "user2"],
-          labels: ["Backend"],
-        },
+          dueDate: 'Dec 25',
+          assignees: ['user1', 'user2'],
+          labels: ['Backend']
+        }
       ],
-      order: 1,
+      order: 1
     },
     {
-      id: "review",
-      title: "In Review",
-      color: "yellow",
+      id: 'review',
+      title: 'In Review',
+      color: 'yellow',
       tasks: [
         {
-          id: "t4",
-          title: "Homepage Redesign",
-          description: "Review new homepage layout and components",
-          reviewer: "John Doe",
-          timeInReview: "2 days",
-          labels: ["UI/UX"],
-        },
+          id: 't4',
+          title: 'Homepage Redesign',
+          description: 'Review new homepage layout and components',
+          reviewer: 'John Doe',
+          timeInReview: '2 days',
+          labels: ['UI/UX']
+        }
       ],
-      order: 2,
+      order: 2
     },
     {
-      id: "done",
-      title: "Done",
-      color: "green",
+      id: 'done',
+      title: 'Done',
+      color: 'green',
       tasks: [
         {
-          id: "t5",
-          title: "User Authentication",
-          description: "Implemented secure login system",
-          completedDate: "Dec 15",
-          assignees: ["user1"],
-        },
+          id: 't5',
+          title: 'User Authentication',
+          description: 'Implemented secure login system',
+          completedDate: 'Dec 15',
+          assignees: ['user1']
+        }
       ],
-      order: 3,
-    },
+      order: 3
+    }
   ]);
 
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
@@ -150,15 +150,17 @@ const KanbanBoard: React.FC = () => {
   const [taskToDelete, setTaskToDelete] = useState<Task | null>(null);
   const [loading] = useState(false);
   const [columnCapacity] = useState({
-    'todo': 10,
+    todo: 10,
     'in-progress': 5,
-    'review': 8,
-    'done': 15
+    review: 8,
+    done: 15
   });
   const [isColumnSettingsOpen, setIsColumnSettingsOpen] = useState(false);
   const [selectedColumn, setSelectedColumn] = useState<Column | null>(null);
 
-  const dragItem = useRef<{ taskId: string; sourceColumnId: string } | null>(null);
+  const dragItem = useRef<{ taskId: string; sourceColumnId: string } | null>(
+    null
+  );
 
   // Handle drag start
   const handleDragStart = (
@@ -167,12 +169,12 @@ const KanbanBoard: React.FC = () => {
     sourceColumnId: string
   ) => {
     dragItem.current = { taskId, sourceColumnId };
-    e.currentTarget.classList.add("dragging");
+    e.currentTarget.classList.add('dragging');
   };
 
   // Handle drag end
   const handleDragEnd = (e: DragEvent<HTMLDivElement>) => {
-    e.currentTarget.classList.remove("dragging");
+    e.currentTarget.classList.remove('dragging');
   };
 
   // Handle drag over
@@ -201,12 +203,13 @@ const KanbanBoard: React.FC = () => {
         if (col.id === sourceColumnId) {
           return {
             ...col,
-            tasks: col.tasks.filter((t) => t.id !== taskId),
+            tasks: col.tasks.filter((t) => t.id !== taskId)
           };
-        } else if (col.id === targetColumnId) {
+        }
+        if (col.id === targetColumnId) {
           return {
             ...col,
-            tasks: [...col.tasks, taskToMove],
+            tasks: [...col.tasks, taskToMove]
           };
         }
         return col;
@@ -218,12 +221,12 @@ const KanbanBoard: React.FC = () => {
 
   // Handle task update
   const handleTaskUpdate = (updatedTask: Task) => {
-    setColumns(prevColumns =>
-      prevColumns.map(column => ({
+    setColumns((prevColumns) =>
+      prevColumns.map((column) => ({
         ...column,
-        tasks: column.tasks.map(task =>
+        tasks: column.tasks.map((task) =>
           task.id === updatedTask.id ? updatedTask : task
-        ),
+        )
       }))
     );
     setIsDetailModalOpen(false);
@@ -231,10 +234,10 @@ const KanbanBoard: React.FC = () => {
 
   // Handle task delete
   const handleTaskDelete = (taskId: string) => {
-    setColumns(prevColumns =>
-      prevColumns.map(column => ({
+    setColumns((prevColumns) =>
+      prevColumns.map((column) => ({
         ...column,
-        tasks: column.tasks.filter(task => task.id !== taskId),
+        tasks: column.tasks.filter((task) => task.id !== taskId)
       }))
     );
     setIsDeleteModalOpen(false);
@@ -258,44 +261,68 @@ const KanbanBoard: React.FC = () => {
 
   // Add this helper function for column capacity percentage
   const getColumnProgress = (columnId: string, tasksCount: number) => {
-    const capacity = columnCapacity[columnId as keyof typeof columnCapacity] || 10;
+    const capacity =
+      columnCapacity[columnId as keyof typeof columnCapacity] || 10;
     return (tasksCount / capacity) * 100;
   };
 
   // Column management functions
   const toggleColumnCollapse = (columnId: string) => {
-    setColumns(prev => prev.map(col => 
-      col.id === columnId ? { ...col, isCollapsed: !col.isCollapsed } : col
-    ));
+    setColumns((prev) =>
+      prev.map((col) =>
+        col.id === columnId ? { ...col, isCollapsed: !col.isCollapsed } : col
+      )
+    );
   };
 
-  const updateColumnSettings = (columnId: string, settings: Column['settings']) => {
-    setColumns(prev => prev.map(col =>
-      col.id === columnId ? { ...col, settings: { ...col.settings, ...settings } } : col
-    ));
+  const updateColumnSettings = (
+    columnId: string,
+    settings: Column['settings']
+  ) => {
+    setColumns((prev) =>
+      prev.map((col) =>
+        col.id === columnId
+          ? { ...col, settings: { ...col.settings, ...settings } }
+          : col
+      )
+    );
   };
 
   // Task management functions
   const addSubtask = (taskId: string, subtask: SubTask) => {
-    setColumns(prev => prev.map(col => ({
-      ...col,
-      tasks: col.tasks.map(task => 
-        task.id === taskId
-          ? { ...task, subtasks: [...(task.subtasks || []), subtask] }
-          : task
-      )
-    })));
+    setColumns((prev) =>
+      prev.map((col) => ({
+        ...col,
+        tasks: col.tasks.map((task) =>
+          task.id === taskId
+            ? { ...task, subtasks: [...(task.subtasks || []), subtask] }
+            : task
+        )
+      }))
+    );
   };
 
   // Add missing collapse/expand icon JSX
   const collapseIcon = (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+    >
       <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
     </svg>
   );
 
   const expandIcon = (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+    >
       <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
     </svg>
   );
@@ -304,35 +331,37 @@ const KanbanBoard: React.FC = () => {
   const handleColumnSettingsSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedColumn) return;
-    
+
     const formElement = e.target as HTMLFormElement;
     const formData = new FormData(formElement);
-    
+
     const settings = {
       taskLimit: Number(formData.get('taskLimit')),
       autoComplete: Boolean(formData.get('autoComplete')),
       defaultPriority: formData.get('defaultPriority') as string
     };
-    
+
     updateColumnSettings(selectedColumn.id, settings);
     setIsColumnSettingsOpen(false);
   };
 
   // Add missing subtask toggle handler
   const handleSubtaskToggle = (taskId: string, subtaskId: string) => {
-    setColumns(prev => prev.map(col => ({
-      ...col,
-      tasks: col.tasks.map(task => 
-        task.id === taskId
-          ? {
-              ...task,
-              subtasks: task.subtasks?.map(st =>
-                st.id === subtaskId ? { ...st, completed: !st.completed } : st
-              )
-            }
-          : task
-      )
-    })));
+    setColumns((prev) =>
+      prev.map((col) => ({
+        ...col,
+        tasks: col.tasks.map((task) =>
+          task.id === taskId
+            ? {
+                ...task,
+                subtasks: task.subtasks?.map((st) =>
+                  st.id === subtaskId ? { ...st, completed: !st.completed } : st
+                )
+              }
+            : task
+        )
+      }))
+    );
   };
 
   // Fix column settings modal content
@@ -343,7 +372,7 @@ const KanbanBoard: React.FC = () => {
         <form onSubmit={handleColumnSettingsSubmit}>
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium">Task Limit</label>
+              <div className="block text-sm font-medium">Task Limit</div>
               <input
                 type="number"
                 name="taskLimit"
@@ -352,7 +381,7 @@ const KanbanBoard: React.FC = () => {
               />
             </div>
             <div>
-              <label className="flex items-center">
+              <div className="flex items-center">
                 <input
                   type="checkbox"
                   name="autoComplete"
@@ -360,10 +389,10 @@ const KanbanBoard: React.FC = () => {
                   className="mr-2"
                 />
                 <span className="text-sm font-medium">Auto Complete Tasks</span>
-              </label>
+              </div>
             </div>
             <div>
-              <label className="block text-sm font-medium">Default Priority</label>
+              <div className="block text-sm font-medium">Default Priority</div>
               <select
                 name="defaultPriority"
                 defaultValue={selectedColumn?.settings?.defaultPriority}
@@ -399,10 +428,13 @@ const KanbanBoard: React.FC = () => {
     return (
       <div className="pt-20 pl-64 pr-6 min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="space-y-4 w-full max-w-[1400px]">
-          <div className="animate-pulse bg-white rounded-2xl h-48 w-full"></div>
+          <div className="animate-pulse bg-white rounded-2xl h-48 w-full" />
           <div className="grid grid-cols-4 gap-6">
             {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="animate-pulse bg-white rounded-2xl h-[600px]"></div>
+              <div
+                key={i}
+                className="animate-pulse bg-white rounded-2xl h-[600px]"
+              />
             ))}
           </div>
         </div>
@@ -417,9 +449,7 @@ const KanbanBoard: React.FC = () => {
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">
-                Kanban Board
-              </h1>
+              <h1 className="text-2xl font-bold text-gray-900">Kanban Board</h1>
               <p className="text-sm text-gray-500 mt-1">
                 Manage your tasks with ease
               </p>
@@ -443,7 +473,7 @@ const KanbanBoard: React.FC = () => {
                     +5
                   </div>
                 </div>
-                <div className="h-6 w-px bg-gray-200"></div>
+                <div className="h-6 w-px bg-gray-200" />
                 <button className="text-sm text-brand-500 font-medium hover:text-brand-600">
                   Manage Team
                 </button>
@@ -503,7 +533,7 @@ const KanbanBoard: React.FC = () => {
 
           {/* Sprint Progress */}
           <div className="space-y-8">
-            < StatsGrid />
+            <StatsGrid />
           </div>
         </div>
 
@@ -532,19 +562,19 @@ const KanbanBoard: React.FC = () => {
             </div>
 
             <div className="flex gap-2">
-              <button className="px-3 py-2 text-sm bg-white border border-gray-100 rounded-xl hover:bg-gray-50">
+              <div className="px-3 py-2 text-sm bg-white border border-gray-100 rounded-xl hover:bg-gray-50">
                 <span className="w-2 h-2 inline-block rounded-full bg-red-500 mr-2"></span>
                 High Priority
-              </button>
-              <button className="px-3 py-2 text-sm bg-white border border-gray-100 rounded-xl hover:bg-gray-50">
+              </div>
+              <div className="px-3 py-2 text-sm bg-white border border-gray-100 rounded-xl hover:bg-gray-50">
                 <span className="w-2 h-2 inline-block rounded-full bg-yellow-500 mr-2"></span>
                 Blocked
-              </button>
+              </div>
             </div>
           </div>
 
           <div className="flex items-center gap-3">
-            <button className="px-3 py-2 text-sm bg-white border border-gray-100 rounded-xl hover:bg-gray-50">
+            <div className="px-3 py-2 text-sm bg-white border border-gray-100 rounded-xl hover:bg-gray-50">
               <svg
                 className="w-4 h-4 text-gray-400"
                 fill="none"
@@ -558,7 +588,7 @@ const KanbanBoard: React.FC = () => {
                   d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"
                 />
               </svg>
-            </button>
+            </div>
 
             <div className="relative">
               <input
@@ -589,7 +619,9 @@ const KanbanBoard: React.FC = () => {
             <div
               key={column.id}
               id={`column-${column.id}`}
-              className={`flex flex-col bg-white rounded-2xl border border-gray-100 shadow-sm transition-all duration-300 ${column.isCollapsed ? 'w-20' : ''}`}
+              className={`flex flex-col bg-white rounded-2xl border border-gray-100 shadow-sm transition-all duration-300 ${
+                column.isCollapsed ? 'w-20' : ''
+              }`}
               onDragOver={(e) => handleDragOver(e)}
               onDrop={(e) => handleDrop(e, column.id)}
             >
@@ -601,14 +633,16 @@ const KanbanBoard: React.FC = () => {
                     </button>
                     {!column.isCollapsed && (
                       <>
-                        <h3 className="text-sm font-semibold text-gray-900">{column.title}</h3>
+                        <h3 className="text-sm font-semibold text-gray-900">
+                          {column.title}
+                        </h3>
                         <span className="px-2.5 py-0.5 text-xs font-medium bg-gray-100 rounded-full">
                           {column.tasks.length}
                         </span>
                       </>
                     )}
                   </div>
-                  <button 
+                  <button
                     onClick={() => {
                       setSelectedColumn(column);
                       setIsColumnSettingsOpen(true);
@@ -618,7 +652,7 @@ const KanbanBoard: React.FC = () => {
                     <svg className="w-5 h-5" />
                   </button>
                 </div>
-                
+
                 {/* Add column capacity progress bar */}
                 <div className="w-full bg-gray-100 rounded-full h-1.5">
                   <div
@@ -631,7 +665,7 @@ const KanbanBoard: React.FC = () => {
                       width: `${Math.min(
                         getColumnProgress(column.id, column.tasks.length),
                         100
-                      )}%`,
+                      )}%`
                     }}
                   />
                 </div>
@@ -640,13 +674,14 @@ const KanbanBoard: React.FC = () => {
                     {column.tasks.length} tasks
                   </span>
                   <span className="text-xs text-gray-500">
-                    {columnCapacity[column.id as keyof typeof columnCapacity]} max
+                    {columnCapacity[column.id as keyof typeof columnCapacity]}{' '}
+                    max
                   </span>
                 </div>
               </div>
 
               {!column.isCollapsed && (
-                <div 
+                <div
                   className="flex-1 p-4 space-y-4 overflow-y-auto scroll-smooth"
                   style={{
                     backgroundImage: `
@@ -683,7 +718,9 @@ const KanbanBoard: React.FC = () => {
                       <div
                         key={task.id}
                         draggable
-                        onDragStart={(e) => handleDragStart(e, task.id, column.id)}
+                        onDragStart={(e) =>
+                          handleDragStart(e, task.id, column.id)
+                        }
                         onDragEnd={handleDragEnd}
                         className="group relative bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 cursor-move"
                         onClick={() => {
@@ -701,8 +738,18 @@ const KanbanBoard: React.FC = () => {
                               }}
                               className="p-1 hover:bg-gray-100 rounded-lg"
                             >
-                              <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+                              <svg
+                                className="w-4 h-4 text-gray-500"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth="2"
+                                  d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"
+                                />
                               </svg>
                             </button>
                           </div>
@@ -712,22 +759,22 @@ const KanbanBoard: React.FC = () => {
                           {/* Show priority badges */}
                           {task.priority && (
                             <>
-                              {task.priority === "high" && (
+                              {task.priority === 'high' && (
                                 <div className="flex items-center gap-2 mb-3">
                                   <span className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium bg-red-50 text-red-600 rounded-lg">
-                                    <span className="w-1 h-1 rounded-full bg-red-600"></span>
+                                    <span className="w-1 h-1 rounded-full bg-red-600" />
                                     High Priority
                                   </span>
                                 </div>
                               )}
-                              {task.priority === "normal" && (
+                              {task.priority === 'normal' && (
                                 <div className="flex items-center gap-2 mb-3">
                                   <span className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium bg-gray-50 text-gray-600 rounded-lg">
                                     Normal Priority
                                   </span>
                                 </div>
                               )}
-                              {task.priority === "low" && (
+                              {task.priority === 'low' && (
                                 <div className="flex items-center gap-2 mb-3">
                                   <span className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium bg-green-50 text-green-600 rounded-lg">
                                     Low Priority
@@ -748,7 +795,10 @@ const KanbanBoard: React.FC = () => {
                           {task.labels?.length ? (
                             <div className="flex flex-wrap gap-2 mb-3">
                               {task.labels.map((label, i) => (
-                                <span key={i} className="px-2 py-1 text-xs bg-gray-100 rounded-lg text-gray-600">
+                                <span
+                                  key={i}
+                                  className="px-2 py-1 text-xs bg-gray-100 rounded-lg text-gray-600"
+                                >
                                   {label}
                                 </span>
                               ))}
@@ -764,7 +814,9 @@ const KanbanBoard: React.FC = () => {
                                   style={{ width: `${task.progress}%` }}
                                 />
                               </div>
-                              <p className="text-xs text-gray-500 mt-1">{task.progress}% done</p>
+                              <p className="text-xs text-gray-500 mt-1">
+                                {task.progress}% done
+                              </p>
                             </div>
                           )}
 
@@ -836,29 +888,54 @@ const KanbanBoard: React.FC = () => {
           <div className="bg-white rounded-2xl p-6 w-full max-w-2xl">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-bold">Task Details</h2>
-              <button onClick={() => setIsDetailModalOpen(false)} className="text-gray-500 hover:text-gray-700">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+              <button
+                onClick={() => setIsDetailModalOpen(false)}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 </svg>
               </button>
             </div>
-            
-            <form onSubmit={(e) => {
-              e.preventDefault();
-              const formData = new FormData(e.currentTarget);
-              const updatedTask = {
-                ...selectedTask,
-                title: formData.get('title') as string,
-                description: formData.get('description') as string,
-                priority: formData.get('priority') as "high" | "normal" | "low",
-                dueDate: formData.get('dueDate') as string,
-                labels: formData.get('labels')?.toString().split(',').map(label => label.trim()) || [],
-              };
-              handleTaskUpdate(updatedTask);
-            }}>
+
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                const formData = new FormData(e.currentTarget);
+                const updatedTask = {
+                  ...selectedTask,
+                  title: formData.get('title') as string,
+                  description: formData.get('description') as string,
+                  priority: formData.get('priority') as
+                    | 'high'
+                    | 'normal'
+                    | 'low',
+                  dueDate: formData.get('dueDate') as string,
+                  labels:
+                    formData
+                      .get('labels')
+                      ?.toString()
+                      .split(',')
+                      .map((label) => label.trim()) || []
+                };
+                handleTaskUpdate(updatedTask);
+              }}
+            >
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
+                  <div className="block text-sm font-medium text-gray-700 mb-1">
+                    Title
+                  </div>
                   <input
                     type="text"
                     name="title"
@@ -868,7 +945,9 @@ const KanbanBoard: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                  <div className="block text-sm font-medium text-gray-700 mb-1">
+                    Description
+                  </div>
                   <textarea
                     name="description"
                     defaultValue={selectedTask.description}
@@ -879,7 +958,9 @@ const KanbanBoard: React.FC = () => {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Priority</label>
+                    <div className="block text-sm font-medium text-gray-700 mb-1">
+                      Priority
+                    </div>
                     <select
                       name="priority"
                       defaultValue={selectedTask.priority}
@@ -892,7 +973,9 @@ const KanbanBoard: React.FC = () => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Due Date</label>
+                    <div className="block text-sm font-medium text-gray-700 mb-1">
+                      Due Date
+                    </div>
                     <input
                       type="text"
                       name="dueDate"
@@ -903,7 +986,9 @@ const KanbanBoard: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Labels (comma-separated)</label>
+                  <div className="block text-sm font-medium text-gray-700 mb-1">
+                    Labels (comma-separated)
+                  </div>
                   <input
                     type="text"
                     name="labels"
@@ -934,9 +1019,15 @@ const KanbanBoard: React.FC = () => {
             <div className="mt-4">
               <h3 className="text-sm font-medium mb-2">Subtasks</h3>
               <div className="space-y-2">
-                {selectedTask.subtasks?.map(subtask => (
+                {selectedTask.subtasks?.map((subtask) => (
                   <div key={subtask.id} className="flex items-center gap-2">
-                    <input type="checkbox" checked={subtask.completed} onChange={() => handleSubtaskToggle(selectedTask.id, subtask.id)} />
+                    <input
+                      type="checkbox"
+                      checked={subtask.completed}
+                      onChange={() =>
+                        handleSubtaskToggle(selectedTask.id, subtask.id)
+                      }
+                    />
                     <span>{subtask.title}</span>
                   </div>
                 ))}
@@ -944,8 +1035,8 @@ const KanbanBoard: React.FC = () => {
                   className="text-sm text-brand-500"
                   onClick={() => {
                     const newSubtask: SubTask = {
-                      id: "sub-" + Date.now(),
-                      title: "New Subtask",
+                      id: 'sub-' + Date.now(),
+                      title: 'New Subtask',
                       completed: false
                     };
                     addSubtask(selectedTask.id, newSubtask);
@@ -960,11 +1051,13 @@ const KanbanBoard: React.FC = () => {
             <div className="mt-4">
               <h3 className="text-sm font-medium mb-2">Comments</h3>
               <div className="space-y-4">
-                {selectedTask.comments?.map(comment => (
+                {selectedTask.comments?.map((comment) => (
                   <div key={comment.id} className="bg-gray-50 rounded-lg p-3">
                     <div className="flex items-center gap-2 mb-1">
                       <span className="font-medium">{comment.author}</span>
-                      <span className="text-xs text-gray-500">{comment.timestamp}</span>
+                      <span className="text-xs text-gray-500">
+                        {comment.timestamp}
+                      </span>
                     </div>
                     <p className="text-sm">{comment.content}</p>
                   </div>
@@ -975,9 +1068,9 @@ const KanbanBoard: React.FC = () => {
                     placeholder="Add a comment..."
                     className="flex-1 px-3 py-2 border rounded-lg"
                   />
-                  <button className="px-4 py-2 bg-brand-500 text-white rounded-lg">
+                  <div className="px-4 py-2 bg-brand-500 text-white rounded-lg">
                     Post
-                  </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -992,11 +1085,13 @@ const KanbanBoard: React.FC = () => {
             <div className="mt-4">
               <h3 className="text-sm font-medium mb-2">Activity History</h3>
               <div className="space-y-2">
-                {selectedTask.activityHistory?.map(activity => (
+                {selectedTask.activityHistory?.map((activity) => (
                   <div key={activity.id} className="text-sm text-gray-600">
-                    <span className="font-medium">{activity.user}</span>
-                    {' '}{activity.description}
-                    <span className="text-xs text-gray-500 ml-2">{activity.timestamp}</span>
+                    <span className="font-medium">{activity.user}</span>{' '}
+                    {activity.description}
+                    <span className="text-xs text-gray-500 ml-2">
+                      {activity.timestamp}
+                    </span>
                   </div>
                 ))}
               </div>
@@ -1010,7 +1105,9 @@ const KanbanBoard: React.FC = () => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-2xl p-6 w-full max-w-md">
             <h2 className="text-xl font-bold mb-4">Delete Task</h2>
-            <p className="text-gray-600 mb-6">Are you sure you want to delete &quot;{taskToDelete.title}&quot;?</p>
+            <p className="text-gray-600 mb-6">
+              Are you sure you want to delete &quot;{taskToDelete.title}&quot;?
+            </p>
             <div className="flex justify-end gap-4">
               <button
                 onClick={() => setIsDeleteModalOpen(false)}

@@ -1,17 +1,18 @@
-import * as React from "react"
+import * as React from 'react';
 
 const Card = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement> & {
-    variant?: "default" | "gradient" | "stats"
+    variant?: 'default' | 'gradient' | 'stats';
   }
->(({ className, variant = "default", ...props }, ref) => {
-  const baseStyles = "rounded-xl bg-white text-gray-950"
+>(({ className, variant = 'default', ...props }, ref) => {
+  const baseStyles = 'rounded-xl bg-white text-gray-950';
   const variantStyles = {
-    default: "border border-gray-100 shadow-sm hover:shadow transition-all duration-300",
-    gradient: "stats-card gradient-border card-shine border-0 shadow-lg",
-    stats: "border-0 shadow-sm hover:shadow-md transition-all duration-300"
-  }
+    default:
+      'border border-gray-100 shadow-sm hover:shadow transition-all duration-300',
+    gradient: 'stats-card gradient-border card-shine border-0 shadow-lg',
+    stats: 'border-0 shadow-sm hover:shadow-md transition-all duration-300'
+  };
 
   return (
     <div
@@ -19,9 +20,9 @@ const Card = React.forwardRef<
       className={`${baseStyles} ${variantStyles[variant]} ${className}`}
       {...props}
     />
-  )
-})
-Card.displayName = "Card"
+  );
+});
+Card.displayName = 'Card';
 
 const CardHeader = React.forwardRef<
   HTMLDivElement,
@@ -32,19 +33,19 @@ const CardHeader = React.forwardRef<
     className={`flex flex-col space-y-1.5 p-6 ${className}`}
     {...props}
   />
-))
-CardHeader.displayName = "CardHeader"
+));
+CardHeader.displayName = 'CardHeader';
 
 const CardTitle = React.forwardRef<
   HTMLParagraphElement,
   React.HTMLAttributes<HTMLHeadingElement> & {
-    variant?: "default" | "large"
+    variant?: 'default' | 'large';
   }
->(({ className, variant = "default", ...props }, ref) => {
+>(({ className, variant = 'default', ...props }, ref) => {
   const variantStyles = {
-    default: "text-lg font-semibold leading-none",
-    large: "text-2xl font-bold leading-none"
-  }
+    default: 'text-lg font-semibold leading-none',
+    large: 'text-2xl font-bold leading-none'
+  };
 
   return (
     <h3
@@ -52,35 +53,31 @@ const CardTitle = React.forwardRef<
       className={`${variantStyles[variant]} tracking-tight ${className}`}
       {...props}
     />
-  )
-})
-CardTitle.displayName = "CardTitle"
+  );
+});
+CardTitle.displayName = 'CardTitle';
 
 const CardDescription = React.forwardRef<
   HTMLParagraphElement,
   React.HTMLAttributes<HTMLParagraphElement>
 >(({ className, ...props }, ref) => (
-  <p
-    ref={ref}
-    className={`text-sm text-gray-500 ${className}`}
-    {...props}
-  />
-))
-CardDescription.displayName = "CardDescription"
+  <p ref={ref} className={`text-sm text-gray-500 ${className}`} {...props} />
+));
+CardDescription.displayName = 'CardDescription';
 
 const CardContent = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement> & {
-    noPadding?: boolean
+    noPadding?: boolean;
   }
 >(({ className, noPadding = false, ...props }, ref) => (
-  <div 
-    ref={ref} 
+  <div
+    ref={ref}
     className={`${noPadding ? '' : 'p-6 pt-0'} ${className}`}
     {...props}
   />
-))
-CardContent.displayName = "CardContent"
+));
+CardContent.displayName = 'CardContent';
 
 const CardFooter = React.forwardRef<
   HTMLDivElement,
@@ -91,14 +88,14 @@ const CardFooter = React.forwardRef<
     className={`flex items-center justify-between p-6 pt-0 ${className}`}
     {...props}
   />
-))
-CardFooter.displayName = "CardFooter"
+));
+CardFooter.displayName = 'CardFooter';
 
-export { 
-  Card, 
-  CardHeader, 
-  CardTitle, 
-  CardDescription, 
-  CardContent, 
+export {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
   CardFooter
-}
+};

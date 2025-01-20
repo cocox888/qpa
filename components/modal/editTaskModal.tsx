@@ -1,13 +1,9 @@
-import { TypeProject, TypeUser } from "@/lib/types";
-import { RootState } from "@/store";
-import { ProjectState } from "@/store/type";
-import axios from "axios";
-import { useState } from "react";
-import { useSelector } from "react-redux";
-import { useForm } from 'react-hook-form';
-import { toast, ToastContainer } from "react-toastify";
-import Toast from "../toast";
+'use client';
 
+import { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import Toast from '../toast';
+import { TypeProject, TypeUser } from '@/lib/types';
 
 export interface TaskItem {
   title?: string;
@@ -26,120 +22,145 @@ interface EditTaskModalProps {
   data: TaskItem;
 }
 
+interface ProjectProps {
+  id?: number;
+  title: string;
+}
+
 const EditTaskModal: React.FC<EditTaskModalProps> = ({
   closeModal,
-  flag,
-  data,
-}) => {
-  const { title } = data;
-  const projects = useSelector((state: RootState) => state.projectSlice?.projects);
-  console.log(projects);
+  flag }) => {
+
   const [projectID, setProjectID] = useState(0);
-  const [taskName, setTaskName] = useState("");
-  const [dueDate, setDueDate] = useState("");
-  const [priority, setPriority] = useState("low");
+  const [taskName, setTaskName] = useState('');
+  const [dueDate, setDueDate] = useState('');
+  const [priority, setPriority] = useState('low');
   const [members, setMembers] = useState<number[]>([]);
   const [memberError, setMemberError] = useState(false);
-
-  const [description, setDescription] = useState("");
+  const [projects, setProjects] = useState<ProjectProps[]>([]);
+  const [description, setDescription] = useState('');
   const [estimateHour, setEstimateHour] = useState<number>(0);
   const [estimateMinute, setEstimateMinute] = useState<number>(0);
   const [totalMembers, setTotalMembers] = useState<TypeUser[]>([]);
 
   const handleProjectSelect = async (projectId: number) => {
     setProjectID(projectId);
-    const users = await axios.get(`/api/project/${projectId}`);
-    setTotalMembers(users.data.users);
+    const token = localStorage.getItem('access_token');
+    const response = await fetch('http://localhost:5173/admin/getprojectbyid', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({ projectId: projectId })
+    });
+    const data = await response.json();
+    setTotalMembers(data.assignedProjectUser);
     setMembers([]);
-  }
+  };
 
-  const { register, formState: { errors }, handleSubmit } = useForm({
+  const {
+    handleSubmit
+  } = useForm({
     defaultValues: {
-      email: "",
-      password: "",
-    },
-  })
+      email: '',
+      password: ''
+    }
+  });
+
+  useEffect(() => {
+    const token = localStorage.getItem('access_token');
+    const fetchProjects = async () => {
+      const response = await fetch(
+        'http://localhost:5173/admin/getAllProjects',
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            authorization: `Bearer ${token}`
+          }
+        }
+      );
+      const data = await response.json();
+
+      const projectArray = data.map((project: TypeProject) => {
+        const temp = {
+          id: project.id,
+          title: project.title
+        };
+        return temp;
+      });
+      setProjects(projectArray);
+    };
+
+    fetchProjects();
+  }, []);
 
   const onSubmit = async () => {
-    members.length == 0 ? setMemberError(true) : setMemberError(false);
+    if (members.length === 0)
+      setMemberError(true);
+    else setMemberError(false);
     if (members.length !== 0) {
       try {
-        const payload = {
-          data: {
-            task_name: taskName,
-            projectId: projectID,
-            due_date: dueDate,
-            priority: priority,
-            description: description,
-            estimated_time: estimateHour * 60 + estimateMinute,
-            state: "todo"
-          },
-          members
-        }
-        const res = await axios.post("/api/task", payload);
-        if (res.status == 200) {
-          console.log("ok")
-          Toast("success", "Task Created Successfully");
-          setProjectID(0);
-          setTaskName("");
-          setDueDate("");
-          setPriority("low");
-          setMembers([]);
-          setDescription("");
-          setEstimateHour(0);
-          setEstimateMinute(0);
-          setTotalMembers([]);
-        }
+        // const payload = {
+        //   data: {
+        //     title: taskName,
+        //     projectId: projectID,
+        //     due_date: dueDate,
+        //     priority: priority,
+        //     description: description,
+        //     estimated_time: estimateHour * 60 + estimateMinute,
+        //     state: 'todo'
+        //   },
+        //   members
+        // };
+        Toast('success', 'Task Created Successfully');
+        closeModal();
+        setProjectID(0);
+        setTaskName('');
+        setDueDate('');
+        setPriority('low');
+        setMembers([]);
+        setDescription('');
+        setEstimateHour(0);
+        setEstimateMinute(0);
+        setTotalMembers([]);
       } catch (error) {
-        Toast("error", "Server Error");
+        console.log(error)
+        Toast('error', 'Server Error');
       }
     }
-
-  }
-  // const memberOptionTemplate = (option: any) => {
-  //   return (
-  //     <div
-  //       className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-  //       <img src="/images/person1.jpg" alt="Sarah Wilson" className="w-8 h-8 rounded-lg" />
-  //       <div>
-  //         <div className="text-sm font-medium text-gray-900">{option.full_name}</div>
-  //         <div className="text-xs text-gray-500">{option.position}</div>
-  //       </div>
-  //     </div>
-  //   )
-
-  // }
+  };
 
   const handleMemberSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value, checked } = e.target;
     if (checked) {
       setMembers((prev) => [...prev, Number(value)]);
     } else {
-      setMembers((prev) => prev.filter((platform) => platform !== Number(value)));
+      setMembers((prev) =>
+        prev.filter((platform) => platform !== Number(value))
+      );
     }
-  }
-
+  };
 
   return (
     <div>
-
       <div
         id="taskModal"
         className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-2xl shadow-2xl border border-gray-100 w-[650px] max-h-[90vh] overflow-y-auto z-[101] transition-all duration-300"
       >
-
         <form onSubmit={handleSubmit(onSubmit)} className="relative">
           {/* <!-- Header --> */}
           <div className="sticky top-0 z-10 bg-white px-8 py-6 border-b border-gray-100">
             <div className="flex items-center justify-between">
               <div>
                 <h2 className="text-xl font-semibold text-gray-900">
-                  {flag == 0 ? "Create New Task" : "Edit Task"}
+                  {flag === 0 ? 'Create New Task' : 'Edit Task'}
                 </h2>
                 <p className="text-sm text-gray-500 mt-1">
-                  {flag == 0
-                    ? "Add a new task to your project"
-                    : "Edit Task of your current project"}
+                  {flag === 0
+                    ? 'Add a new task to your project'
+                    : 'Edit Task of your current project'}
                 </p>
               </div>
               <button
@@ -153,6 +174,7 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
+                  aria-hidden="true"
                 >
                   <path
                     strokeLinecap="round"
@@ -204,13 +226,13 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
                 value={projectID}
               >
                 <option value="">Select Project</option>
-                {
-                  projects.map((project: any, index: number) => {
-                    return (
-                      <option key={index} value={project.id}>{project.project_name}</option>
-                    )
-                  })
-                }
+                {projects.map((project: ProjectProps, index: number) => {
+                  return (
+                    <option key={index} value={project.id}>
+                      {project.title}
+                    </option>
+                  );
+                })}
               </select>
             </div>
 
@@ -257,27 +279,38 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
 
             {/* <!-- Assignees --> */}
             <div className="space-y-3">
-              <label className="block text-sm font-medium text-gray-700">
+              <div className="block text-sm font-medium text-gray-700">
                 Assign Team Members<span className="text-red-500"> *</span>
-              </label>
-              {
-                totalMembers.length == 0 ? (
-                  <div className="bg-gray-50 w-full h-[100px] rounded-xl text-gray-500 justify-center items-center flex" >
-                    <p>Please select a Project.</p>
-                  </div>
-                ) : (<></>)
-              }
+              </div>
+              {totalMembers.length === 0 ? (
+                <div className="bg-gray-50 w-full h-[100px] rounded-xl text-gray-500 justify-center items-center flex">
+                  <p>Please select a Project.</p>
+                </div>
+              ) : (
+                <></>
+              )}
               {totalMembers.map((user, index) => (
-                <div key={index}
-                  className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                  <img src="/images/person1.jpg" alt="Sarah Wilson" className="w-8 h-8 rounded-lg" />
+                <div
+                  key={index}
+                  className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                >
+                  <img
+                    src="/images/person1.jpg"
+                    alt="Sarah Wilson"
+                    className="w-8 h-8 rounded-lg"
+                  />
                   <div>
-                    <div className="text-sm font-medium text-gray-900">{user.full_name}</div>
+                    <div className="text-sm font-medium text-gray-900">
+                      {user.full_name}
+                    </div>
                     <div className="text-xs text-gray-500">{user.position}</div>
                   </div>
                   <label className="flex items-center gap-2 ml-auto">
-                    <input type="checkbox" name="teamMembers[]" value={user.id}
-                      checked={members.includes(user.id)}
+                    <input
+                      type="checkbox"
+                      name="teamMembers[]"
+                      value={user.id}
+                      // checked={members.includes(user.id)}
                       onChange={(e) => handleMemberSelect(e)}
                       className="rounded border-gray-300 text-brand-500 focus:ring-brand-500"
                     />
@@ -285,13 +318,13 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
                   </label>
                 </div>
               ))}
-              {
-                memberError ? (
-                  <div className="active error-message text-sm text-red-500 mt-1">Please select at least one user.</div>
-                ) : (
-                  <div></div>
-                )
-              }
+              {memberError ? (
+                <div className="active error-message text-sm text-red-500 mt-1">
+                  Please select at least one user.
+                </div>
+              ) : (
+                <div>&nbsp;</div>
+              )}
               {/* <!-- Search Input --> */}
               {/* <div className="relative flex justify-center items-center border-[1px] rounded-xl pr-2"> */}
               {/* <input
@@ -385,15 +418,17 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
                 className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-colors resize-none"
                 placeholder="Enter task descrsption"
                 value={description}
-                onChange={(e) => { setDescription(e.target.value) }}
-              ></textarea>
+                onChange={(e) => {
+                  setDescription(e.target.value);
+                }}
+              />
             </div>
 
             {/* <!-- Estimated Time --> */}
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">
+              <div className="block text-sm font-medium text-gray-700">
                 Estimated Time
-              </label>
+              </div>
               <div className="flex items-center gap-4 bg-gray-50 p-4 rounded-xl">
                 <div className="flex items-center gap-2">
                   <input
@@ -405,7 +440,7 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
                     placeholder="0"
                     value={estimateHour}
                     onChange={(e) => {
-                      setEstimateHour(Number(e.target.value))
+                      setEstimateHour(Number(e.target.value));
                     }}
                   />
                   <span className="text-sm font-medium text-gray-600">hrs</span>
@@ -424,7 +459,9 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
                       setEstimateMinute(Number(e.target.value));
                     }}
                   />
-                  <span className="text-sm font-medium text-gray-600">mins</span>
+                  <span className="text-sm font-medium text-gray-600">
+                    mins
+                  </span>
                 </div>
               </div>
             </div>
@@ -433,17 +470,15 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
           {/* <!-- Footer --> */}
           <div className="sticky bottom-0 px-8 py-6 bg-white border-t border-gray-100">
             <div className="flex items-center justify-end gap-3">
-              <div
-
+              <button
                 onClick={closeModal}
                 className="cursor-pointer px-6 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 focus:ring-2 focus:ring-brand-500/20 transition-colors"
               >
                 Cancel
-              </div>
+              </button>
               <button
                 type="submit"
                 className="px-6 py-2.5 text-sm font-medium text-white bg-brand-500 border border-transparent rounded-xl hover:bg-brand-600 focus:ring-2 focus:ring-brand-500/20 transition-colors"
-
               >
                 Create Task
               </button>
@@ -452,7 +487,6 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
         </form>
       </div>
     </div>
-
   );
 };
 

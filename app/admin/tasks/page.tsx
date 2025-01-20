@@ -1,39 +1,43 @@
-"use client";
+'use client';
 
-import SimpleCard2 from "@/components/card/simpleCard2";
+import type { AppDispatch, RootState } from '@/app/reducers/store';
+import { getAllTasks } from '@/app/reducers/tasks';
+import SimpleCard2 from '@/components/card/simpleCard2';
 import {
   CompleteIcon,
   DueIcon,
   PendingIcon,
-  ProgressIcon,
-} from "@/components/Icons/TaskIcons";
-import EditTaskModal, { TaskItem } from "@/components/modal/editTaskModal";
-import TasklistItem from "@/components/TasklistItem";
-import { TypeProject, TypeTask } from "@/lib/types";
-import { RootState } from "@/store";
-import { useState } from "react";
-import { useSelector } from "react-redux";
-import { ToastContainer } from "react-toastify";
+  ProgressIcon
+} from '@/components/Icons/TaskIcons';
+import EditTaskModal, { type TaskItem } from '@/components/modal/editTaskModal';
+import TasklistItem from '@/components/TasklistItem';
+import { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { toast, ToastContainer } from 'react-toastify';
 
 export default function Projects() {
   const [editModal, setEditModal] = useState(false);
   const [index, setIndex] = useState(0);
+  const [count, setCount] = useState(false);
   const [taskData, setTaskData] = useState<TaskItem>({
-    title: "",
-    project: "",
-    hours: "",
+    title: '',
+    project: '',
+    hours: '',
     members: 0,
-    state: "",
-    time: "",
-    company: "",
-    startTime: "",
+    state: '',
+    time: '',
+    company: '',
+    startTime: ''
   });
+  const dispatch: AppDispatch = useDispatch();
+  const taskCounts = useSelector((state: RootState) => state.tasks.taskCounts);
+  const tasks = useSelector((state: RootState) => state.tasks.tasks);
 
-  const [count, setCount] = useState(4);
-  const tasks: TypeTask[] = useSelector((state: RootState) => state.taskSlice?.tasks);
-  const projects:TypeProject[] = useSelector((state: RootState) => state.projectSlice?.projects);
-
-  console.log(tasks);
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+  useEffect(() => {
+    dispatch(getAllTasks());
+    setCount(false);
+  }, [dispatch, count, editModal]);
 
   const handleTask = (i: number, data: TaskItem) => {
     setIndex(i);
@@ -41,15 +45,25 @@ export default function Projects() {
     setEditModal(true);
   };
 
-  const handleDelete = () => {
-    console.log("delete");
-    if (count >= 1) {
-      setCount(count - 1);
-    }
+
+  const handleDelete = async (id: number) => {
+    const token = localStorage.getItem('access_token');
+    const response = await fetch(
+      `http://localhost:5173/admin/deleteTask?taskId=${id}`,
+      {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          authorization: `Bearer ${token}`
+        }
+      }
+    );
+    const res = await response.json();
+    toast(res.message);
+    setCount(true);
   };
 
   return (
-
     <div className="pt-20 pl-64 pr-6 min-h-screen w-screen overflow-x-hidden">
       <ToastContainer />
       <div className=" mx-auto space-y-6">
@@ -86,25 +100,25 @@ export default function Projects() {
         {/* <!-- Stats Cards --> */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <SimpleCard2
-            count={24}
+            count={taskCounts.pending}
             title="Pending"
             icon={PendingIcon}
             color="blue"
           />
           <SimpleCard2
-            count={12}
+            count={taskCounts.inProgress}
             title="In Progress"
             icon={ProgressIcon}
             color="yellow"
           />
           <SimpleCard2
-            count={128}
+            count={taskCounts.completed}
             title="Completed"
             icon={CompleteIcon}
             color="green"
           />
           <SimpleCard2
-            count={8}
+            count={taskCounts.dueToday}
             title="Due Today"
             icon={DueIcon}
             color="purple"
@@ -117,7 +131,7 @@ export default function Projects() {
           <div className="p-4 border-b border-gray-100">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
-                <button
+                <div
                   data-filter="all"
                   className="px-4 py-2 text-sm font-medium rounded-lg text-brand-500 bg-brand-50"
                 >
@@ -126,10 +140,10 @@ export default function Projects() {
                     data-all-count
                     className="ml-2 px-2 py-0.5 text-xs rounded-full bg-gray-100 text-gray-600"
                   >
-                    128
+                    {taskCounts.allTasksNum}
                   </span>
-                </button>
-                <button
+                </div>
+                <div
                   data-filter="my"
                   className="px-4 py-2 text-sm font-medium rounded-lg text-gray-600 hover:bg-gray-50"
                 >
@@ -138,9 +152,9 @@ export default function Projects() {
                     data-my-count
                     className="ml-2 px-2 py-0.5 text-xs rounded-full bg-gray-100 text-gray-600"
                   >
-                    45
+                    {taskCounts.myTaskNum}
                   </span>
-                </button>
+                </div>
               </div>
 
               <div className="flex items-center gap-3">
@@ -165,7 +179,7 @@ export default function Projects() {
                     />
                   </svg>
                 </div>
-                <button
+                <div
                   data-filter-btn
                   className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-600 bg-gray-50 rounded-lg hover:bg-gray-100"
                 >
@@ -183,41 +197,30 @@ export default function Projects() {
                     />
                   </svg>
                   Filters
-                </button>
+                </div>
               </div>
             </div>
           </div>
           {/* <!-- Task List --> */}
           <div className="p-4 space-y-2">
-            {tasks.map(
-              (item, index: number) => {
-                return (
-                  <TasklistItem
-                    key={index}
-                    title={String(item.task_name)}
-                    project={String(projects.find(item1=>item1.id==item.projectId))}
-                    hours="32h 45m"
-                    state="In Progress"
-                    time="Due Tomorrow"
-                    members={2}
-                    company="TechCorp Inc"
-                    startTime="Started:Oct 15,2024"
-                    onDetail={handleTask}
-                    onDelete={handleDelete}
-                  />
-                );
-              }
-            )}
-            {/* <TasklistItem title="Update user dashboard interface"
-                        //     project="Website Redesign Project"
-                        //     hours="32h 45m" state="In Progress" time="Due Tomorrow"
-                        //     members={2} company="TechCorp Inc" startTime="Started:Oct 15,2024"
-                        //     onDetail={handleTask} />
-                        // <TasklistItem title="Design system updates"
-                        //     project="Brand Guidelines"
-                        //     hours="18h 20m" state="Completed" time="Today"
-                        //     members={1} company="DesignCo Ltd" startTime="Started:Oct 12,2024"
-                        //     onDetail={handleTask} /> */}
+            {tasks.map((item, index: number) => {
+              return (
+                <TasklistItem
+                  key={index}
+                  id={item.id || 0}
+                  title={String(item.title)}
+                  project={String(item.title)}
+                  hours={item.estimated_time || 0}
+                  state={item.state || ''}
+                  time={item.due_date || ''}
+                  members={item.assignedTaskUser?.length || 0}
+                  company={item.taskClient?.business_name || 'Undefined'}
+                  startTime={'Started:Oct 15,2024'}
+                  onDetail={handleTask}
+                  onDelete={handleDelete}
+                />
+              );
+            })}
           </div>
         </div>
       </div>
@@ -228,11 +231,13 @@ export default function Projects() {
             flag={index}
             data={taskData}
           />
-          <div
+          <button
             id="taskModalOverlay"
             className="active modal-overlay fixed inset-0 bg-black/50 z-[100] transition-all duration-300"
             onClick={() => setEditModal(false)}
-          ></div>
+          >
+            &nbsp;
+          </button>
         </>
       ) : (
         <></>

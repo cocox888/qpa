@@ -1,3 +1,0 @@
--- AlterTable
-ALTER TABLE "Task" ALTER COLUMN "due_date" SET DATA TYPE TEXT,
-ALTER COLUMN "priority" DROP NOT NULL;

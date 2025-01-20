@@ -226,25 +226,25 @@ export default function ProjectDetailModal({ onClose, data}: { onClose: () => vo
     const getTimelineTemplate = () => {
         return (
             <>
-                <div className="relative pl-10 pb-6  border-gray-500/50 border-l-2">
+                <div className="relative pl-10 pb-6  border-gray-300/50 border-l-2">
                     <div className="absolute -left-2 -top-1 w-4 h-4 rounded-full bg-brand-500"></div>
-                    <div className="text-sm">
+                    <div className="text-sm space-x-2">
                         <span className="font-medium text-gray-900">Sarah Wilson</span>
                         <span className="text-gray-500">logged 2.5 hours for Content Creation</span>
                     </div>
                     <span className="text-xs text-gray-400">2 hours ago</span>
                 </div>
-                <div className="relative pl-10 pb-6  border-gray-500/50 border-l-2 ">
+                <div className="relative pl-10 pb-6  border-gray-300/50 border-l-2 ">
                     <div className="absolute -left-2 -top-1 w-4 h-4 rounded-full bg-gray-200"></div>
-                    <div className="text-sm">
+                    <div className="text-sm space-x-2">
                         <span className="font-medium text-gray-900">Mike Johnson</span>
                         <span className="text-gray-500">completed milestone: Strategy Phase</span>
                     </div>
                     <span className="text-xs text-gray-400">Yesterday at 4:30 PM</span>
                 </div>
-                <div className="relative pl-10 pb-6  border-gray-500/50 border-l-2 ">
+                <div className="relative pl-10 pb-6  border-gray-300/50 border-l-2 ">
                     <div className="absolute -left-2 -top-1 w-4 h-4 rounded-full bg-gray-200"></div>
-                    <div className="text-sm">
+                    <div className="text-sm space-x-2">
                         <span className="font-medium text-gray-900">Emily Chen</span>
                         <span className="text-gray-500">added a comment</span>
                     </div>

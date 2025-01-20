@@ -9,7 +9,11 @@ import {
 } from "@/components/Icons/TaskIcons";
 import EditTaskModal, { TaskItem } from "@/components/modal/editTaskModal";
 import TasklistItem from "@/components/TasklistItem";
+import { TypeProject, TypeTask } from "@/lib/types";
+import { RootState } from "@/store";
 import { useState } from "react";
+import { useSelector } from "react-redux";
+import { ToastContainer } from "react-toastify";
 
 export default function Projects() {
   const [editModal, setEditModal] = useState(false);
@@ -26,6 +30,11 @@ export default function Projects() {
   });
 
   const [count, setCount] = useState(4);
+  const tasks: TypeTask[] = useSelector((state: RootState) => state.taskSlice?.tasks);
+  const projects:TypeProject[] = useSelector((state: RootState) => state.projectSlice?.projects);
+
+  console.log(tasks);
+
   const handleTask = (i: number, data: TaskItem) => {
     setIndex(i);
     setTaskData(data);
@@ -40,7 +49,9 @@ export default function Projects() {
   };
 
   return (
+
     <div className="pt-20 pl-64 pr-6 min-h-screen w-screen overflow-x-hidden">
+      <ToastContainer />
       <div className=" mx-auto space-y-6">
         {/* <!-- Header Section --> */}
         <div className="flex items-center justify-between">
@@ -178,13 +189,13 @@ export default function Projects() {
           </div>
           {/* <!-- Task List --> */}
           <div className="p-4 space-y-2">
-            {Array.from({ length: count }, (_, index) => index + 1).map(
-              (item, index) => {
+            {tasks.map(
+              (item, index: number) => {
                 return (
                   <TasklistItem
                     key={index}
-                    title="Update user dashboard interface"
-                    project="Website Redesign Project"
+                    title={String(item.task_name)}
+                    project={String(projects.find(item1=>item1.id==item.projectId))}
                     hours="32h 45m"
                     state="In Progress"
                     time="Due Tomorrow"
@@ -213,7 +224,7 @@ export default function Projects() {
       {editModal ? (
         <>
           <EditTaskModal
-            closeModal={()=>setEditModal(false)}
+            closeModal={() => setEditModal(false)}
             flag={index}
             data={taskData}
           />

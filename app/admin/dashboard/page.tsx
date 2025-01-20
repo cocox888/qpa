@@ -1,5 +1,4 @@
 "use client"
-
 import ButtonSecondary from "@/components/button/buttonSecondary";
 import MemberCard from "@/components/card/memberCard";
 import ProjectCard from "@/components/card/projectCard";
@@ -10,18 +9,31 @@ import ClientTable from "@/components/table/clientTable";
 import EmployeeTable from "@/components/table/employeeTable";
 import ProjectTable from "@/components/table/projectTable";
 import TaskTable from "@/components/table/taskTable";
+import { useAppDispatch } from "@/store";
+import { fetchClients } from "@/store/client";
+import { fetchProjects } from "@/store/project";
+import { fetchTasks } from "@/store/task";
+import { ProjectState } from "@/store/type";
+import { fetchUsers } from "@/store/user";
 import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 
 
 export default function Dashboard() {
     const [index, setIndex] = useState(0);
-    useEffect(() => {
-        document.title = "Dashboard | QPA";
-    }, [index]);
+    const dispatch = useAppDispatch();
 
-    const handleIndex = (index:number) => {
+    useEffect(() => {
+        dispatch(fetchProjects());
+        dispatch(fetchUsers());
+        dispatch(fetchClients());
+        dispatch(fetchTasks());
+    }, [dispatch]);
+
+    const handleIndex = (index: number) => {
         setIndex(index);
     }
+
     return (
         <>
             <div className="py-20 pl-64 pr-6 w-screen min-h-screen overflow-x-hidden">
@@ -65,10 +77,10 @@ export default function Dashboard() {
                         <div className="border-b border-gray-100">
                             <div className="flex items-center justify-between p-4">
                                 <div className="flex items-center gap-4">
-                                    <ButtonSecondary title="Employees" count={8} onClick={handleIndex} index={0} isActive={index==0}/>
-                                    <ButtonSecondary title="Projects" count={12} onClick={handleIndex} index={1} isActive={index==1}/>
-                                    <ButtonSecondary title="Tasks" count={24} onClick={handleIndex} index={2} isActive={index==2}/>
-                                    <ButtonSecondary title="Clients" count={6} onClick={handleIndex} index={3} isActive={index==3}/>
+                                    <ButtonSecondary title="Employees" count={8} onClick={handleIndex} index={0} isActive={index == 0} />
+                                    <ButtonSecondary title="Projects" count={12} onClick={handleIndex} index={1} isActive={index == 1} />
+                                    <ButtonSecondary title="Tasks" count={24} onClick={handleIndex} index={2} isActive={index == 2} />
+                                    <ButtonSecondary title="Clients" count={6} onClick={handleIndex} index={3} isActive={index == 3} />
                                 </div>
 
                                 <div className="flex items-center gap-3">

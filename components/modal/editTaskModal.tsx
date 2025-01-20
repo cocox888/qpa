@@ -1,3 +1,14 @@
+import { TypeProject, TypeUser } from "@/lib/types";
+import { RootState } from "@/store";
+import { ProjectState } from "@/store/type";
+import axios from "axios";
+import { useState } from "react";
+import { useSelector } from "react-redux";
+import { useForm } from 'react-hook-form';
+import { toast, ToastContainer } from "react-toastify";
+import Toast from "../toast";
+
+
 export interface TaskItem {
   title?: string;
   project?: string;
@@ -21,143 +32,278 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
   data,
 }) => {
   const { title } = data;
+  const projects = useSelector((state: RootState) => state.projectSlice?.projects);
+  console.log(projects);
+  const [projectID, setProjectID] = useState(0);
+  const [taskName, setTaskName] = useState("");
+  const [dueDate, setDueDate] = useState("");
+  const [priority, setPriority] = useState("low");
+  const [members, setMembers] = useState<number[]>([]);
+  const [memberError, setMemberError] = useState(false);
+
+  const [description, setDescription] = useState("");
+  const [estimateHour, setEstimateHour] = useState<number>(0);
+  const [estimateMinute, setEstimateMinute] = useState<number>(0);
+  const [totalMembers, setTotalMembers] = useState<TypeUser[]>([]);
+
+  const handleProjectSelect = async (projectId: number) => {
+    setProjectID(projectId);
+    const users = await axios.get(`/api/project/${projectId}`);
+    setTotalMembers(users.data.users);
+    setMembers([]);
+  }
+
+  const { register, formState: { errors }, handleSubmit } = useForm({
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  })
+
+  const onSubmit = async () => {
+    members.length == 0 ? setMemberError(true) : setMemberError(false);
+    if (members.length !== 0) {
+      try {
+        const payload = {
+          data: {
+            task_name: taskName,
+            projectId: projectID,
+            due_date: dueDate,
+            priority: priority,
+            description: description,
+            estimated_time: estimateHour * 60 + estimateMinute,
+            state: "todo"
+          },
+          members
+        }
+        const res = await axios.post("/api/task", payload);
+        if (res.status == 200) {
+          console.log("ok")
+          Toast("success", "Task Created Successfully");
+          setProjectID(0);
+          setTaskName("");
+          setDueDate("");
+          setPriority("low");
+          setMembers([]);
+          setDescription("");
+          setEstimateHour(0);
+          setEstimateMinute(0);
+          setTotalMembers([]);
+        }
+      } catch (error) {
+        Toast("error", "Server Error");
+      }
+    }
+
+  }
+  // const memberOptionTemplate = (option: any) => {
+  //   return (
+  //     <div
+  //       className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+  //       <img src="/images/person1.jpg" alt="Sarah Wilson" className="w-8 h-8 rounded-lg" />
+  //       <div>
+  //         <div className="text-sm font-medium text-gray-900">{option.full_name}</div>
+  //         <div className="text-xs text-gray-500">{option.position}</div>
+  //       </div>
+  //     </div>
+  //   )
+
+  // }
+
+  const handleMemberSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value, checked } = e.target;
+    if (checked) {
+      setMembers((prev) => [...prev, Number(value)]);
+    } else {
+      setMembers((prev) => prev.filter((platform) => platform !== Number(value)));
+    }
+  }
+
 
   return (
-    <div
-      id="taskModal"
-      className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-2xl shadow-2xl border border-gray-100 w-[650px] max-h-[90vh] overflow-y-auto z-[101] transition-all duration-300"
-    >
-      <form id="newTaskForm" className="relative">
-        {/* <!-- Header --> */}
-        <div className="sticky top-0 z-10 bg-white px-8 py-6 border-b border-gray-100">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-xl font-semibold text-gray-900">
-                {flag == 0 ? "Create New Task" : "Edit Task"}
-              </h2>
-              <p className="text-sm text-gray-500 mt-1">
-                {flag == 0
-                  ? "Add a new task to your project"
-                  : "Edit Task of your current project"}
-              </p>
-            </div>
-            <button
-              type="button"
-              data-close-modal
-              onClick={closeModal}
-              className="p-2 text-gray-400 hover:text-gray-500 hover:bg-gray-100 rounded-xl transition-all"
-            >
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
+    <div>
+
+      <div
+        id="taskModal"
+        className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-2xl shadow-2xl border border-gray-100 w-[650px] max-h-[90vh] overflow-y-auto z-[101] transition-all duration-300"
+      >
+
+        <form onSubmit={handleSubmit(onSubmit)} className="relative">
+          {/* <!-- Header --> */}
+          <div className="sticky top-0 z-10 bg-white px-8 py-6 border-b border-gray-100">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-xl font-semibold text-gray-900">
+                  {flag == 0 ? "Create New Task" : "Edit Task"}
+                </h2>
+                <p className="text-sm text-gray-500 mt-1">
+                  {flag == 0
+                    ? "Add a new task to your project"
+                    : "Edit Task of your current project"}
+                </p>
+              </div>
+              <button
+                type="button"
+                data-close-modal
+                onClick={closeModal}
+                className="p-2 text-gray-400 hover:text-gray-500 hover:bg-gray-100 rounded-xl transition-all"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="1.5"
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            </button>
-          </div>
-        </div>
-
-        {/* <!-- Form Content --> */}
-        <div className="p-8 space-y-8 bg-white">
-          {/* <!-- Task Title --> */}
-          <div className="space-y-2">
-            <label
-              htmlFor="taskTitle"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Task Title <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              id="taskTitle"
-              name="taskTitle"
-              required
-              className="w-full h-11 px-4 rounded-xl border border-gray-200 focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-colors"
-              placeholder="Enter task title"
-              value={flag == 1 ? title : ""}
-            />
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="1.5"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            </div>
           </div>
 
-          {/* <!-- Project Selection --> */}
-          <div className="space-y-2">
-            <label
-              htmlFor="project"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Project <span className="text-red-500">*</span>
-            </label>
-            <select
-              id="project"
-              name="project"
-              required
-              className="w-full h-11 px-4 rounded-xl border border-gray-200 focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-colors"
-            >
-              <option value="">Select Project</option>
-              <option value="website-redesign">Website Redesign</option>
-              <option value="marketing-campaign">Marketing Campaign</option>
-              <option value="brand-guidelines">Brand Guidelines</option>
-            </select>
-          </div>
-
-          {/* <!-- Due Date & Priority --> */}
-          <div className="grid grid-cols-2 gap-6">
+          {/* <!-- Form Content --> */}
+          <div className="p-8 space-y-8 bg-white">
+            {/* <!-- Task Title --> */}
             <div className="space-y-2">
               <label
-                htmlFor="dueDate"
+                htmlFor="taskTitle"
                 className="block text-sm font-medium text-gray-700"
               >
-                Due Date <span className="text-red-500">*</span>
+                Task Title <span className="text-red-500">*</span>
               </label>
               <input
-                type="date"
-                id="dueDate"
-                name="dueDate"
+                type="text"
+                id="taskTitle"
+                name="taskTitle"
                 required
                 className="w-full h-11 px-4 rounded-xl border border-gray-200 focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-colors"
+                placeholder="Enter task title"
+                value={taskName}
+                onChange={(e) => setTaskName(e.target.value)}
               />
             </div>
+
+            {/* <!-- Project Selection --> */}
             <div className="space-y-2">
               <label
-                htmlFor="priority"
+                htmlFor="project"
                 className="block text-sm font-medium text-gray-700"
               >
-                Priority
+                Project <span className="text-red-500">*</span>
               </label>
               <select
-                id="priority"
-                name="priority"
+                id="project"
+                name="project"
+                required
                 className="w-full h-11 px-4 rounded-xl border border-gray-200 focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-colors"
+                onChange={(e) => handleProjectSelect(Number(e.target.value))}
+                value={projectID}
               >
-                <option value="low">Low Priority</option>
-                <option value="medium">Medium Priority</option>
-                <option value="high">High Priority</option>
+                <option value="">Select Project</option>
+                {
+                  projects.map((project: any, index: number) => {
+                    return (
+                      <option key={index} value={project.id}>{project.project_name}</option>
+                    )
+                  })
+                }
               </select>
             </div>
-          </div>
 
-          {/* <!-- Assignees --> */}
-          <div className="space-y-3">
-            <label className="block text-sm font-medium text-gray-700">
-              Assign Team Members
-            </label>
+            {/* <!-- Due Date & Priority --> */}
+            <div className="grid grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <label
+                  htmlFor="dueDate"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Due Date <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="date"
+                  id="dueDate"
+                  name="dueDate"
+                  required
+                  className="w-full h-11 px-4 rounded-xl border border-gray-200 focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-colors"
+                  onChange={(e) => setDueDate(e.target.value)}
+                  value={dueDate}
+                />
+              </div>
+              <div className="space-y-2">
+                <label
+                  htmlFor="priority"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Priority
+                </label>
+                <select
+                  id="priority"
+                  name="priority"
+                  className="w-full h-11 px-4 rounded-xl border border-gray-200 focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-colors"
+                  value={priority}
+                  onChange={(e) => setPriority(e.target.value)}
+                >
+                  <option value="">Select Priority</option>
+                  <option value="low">Low Priority</option>
+                  <option value="medium">Medium Priority</option>
+                  <option value="high">High Priority</option>
+                </select>
+              </div>
+            </div>
 
-            {/* <!-- Search Input --> */}
-            <div className="relative">
-              <input
+            {/* <!-- Assignees --> */}
+            <div className="space-y-3">
+              <label className="block text-sm font-medium text-gray-700">
+                Assign Team Members<span className="text-red-500"> *</span>
+              </label>
+              {
+                totalMembers.length == 0 ? (
+                  <div className="bg-gray-50 w-full h-[100px] rounded-xl text-gray-500 justify-center items-center flex" >
+                    <p>Please select a Project.</p>
+                  </div>
+                ) : (<></>)
+              }
+              {totalMembers.map((user, index) => (
+                <div key={index}
+                  className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                  <img src="/images/person1.jpg" alt="Sarah Wilson" className="w-8 h-8 rounded-lg" />
+                  <div>
+                    <div className="text-sm font-medium text-gray-900">{user.full_name}</div>
+                    <div className="text-xs text-gray-500">{user.position}</div>
+                  </div>
+                  <label className="flex items-center gap-2 ml-auto">
+                    <input type="checkbox" name="teamMembers[]" value={user.id}
+                      checked={members.includes(user.id)}
+                      onChange={(e) => handleMemberSelect(e)}
+                      className="rounded border-gray-300 text-brand-500 focus:ring-brand-500"
+                    />
+                    <span className="text-sm text-gray-700">Assign</span>
+                  </label>
+                </div>
+              ))}
+              {
+                memberError ? (
+                  <div className="active error-message text-sm text-red-500 mt-1">Please select at least one user.</div>
+                ) : (
+                  <div></div>
+                )
+              }
+              {/* <!-- Search Input --> */}
+              {/* <div className="relative flex justify-center items-center border-[1px] rounded-xl pr-2"> */}
+              {/* <input
                 type="text"
                 placeholder="Search team members..."
                 className="w-full h-11 pl-10 pr-4 rounded-xl border border-gray-200 focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-colors"
                 id="teamSearch"
-              />
+              /> */}
+              {/* <Dropdown placeholder="Search team members..." options={totalMembers} itemTemplate={memberOptionTemplate}
+                className="w-full border-gray-200 pl-10 py-2 rounded-xl" filter/>
               <svg
-                className="w-5 h-5 absolute left-3 top-3 text-gray-400"
+                className="w-5 h-5 absolute left-3 top-2.5 text-gray-400"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -169,35 +315,36 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
                   d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
                 />
               </svg>
-            </div>
+            </div> */}
 
-            {/* <!-- Selected Members --> */}
-            <div className="bg-gray-50 rounded-xl p-4">
+              {/* <!-- Selected Members --> */}
+              {/* <div className="bg-gray-50 rounded-xl p-4">
               <div className="text-xs font-medium text-gray-500 mb-3">
                 Selected Members
               </div>
-              <div className="flex flex-wrap gap-2" id="selectedMembers">
-                {/* <!-- Selected members will be added here --> */}
-              </div>
+              <div className="flex flex-wrap gap-2" id="selectedMembers"> */}
+              {/* <!-- Selected members will be added here --> */}
+              {/* safss
+              </div> */}
               {/* <!-- Empty state for no selections --> */}
-              <div
+              {/* <div
                 id="noSelectionsMessage"
                 className="text-sm text-gray-500 text-center py-2"
               >
                 No team members selected
               </div>
-            </div>
+            </div> */}
 
-            {/* <!-- Dropdown Results --> */}
-            <div
+              {/* <!-- Dropdown Results --> */}
+              {/* <div
               className="max-h-[200px] overflow-y-auto bg-white rounded-xl border border-gray-200 shadow-lg hidden"
               id="searchResults"
             >
-              <div className="p-2 space-y-1">
-                {/* <!-- Results will be populated here --> */}
-              </div>
+              <div className="p-2 space-y-1"> */}
+              {/* <!-- Results will be populated here --> */}
+              {/* </div> */}
               {/* <!-- No Results State --> */}
-              <div id="noResultsState" className="hidden p-8 text-center">
+              {/* <div id="noResultsState" className="hidden p-8 text-center">
                 <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-gray-100 mb-3">
                   <svg
                     className="w-6 h-6 text-gray-400"
@@ -220,79 +367,92 @@ const EditTaskModal: React.FC<EditTaskModalProps> = ({
                   Try searching with a different term
                 </p>
               </div>
+            </div>*/}
             </div>
-          </div>
 
-          {/* <!-- Description --> */}
-          <div className="space-y-2">
-            <label
-              htmlFor="description"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Description
-            </label>
-            <textarea
-              id="description"
-              name="description"
-              rows={4}
-              className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-colors resize-none"
-              placeholder="Enter task description"
-            ></textarea>
-          </div>
+            {/* <!-- Description --> */}
+            <div className="space-y-2">
+              <label
+                htmlFor="description"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Description
+              </label>
+              <textarea
+                id="description"
+                name="description"
+                rows={4}
+                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-colors resize-none"
+                placeholder="Enter task descrsption"
+                value={description}
+                onChange={(e) => { setDescription(e.target.value) }}
+              ></textarea>
+            </div>
 
-          {/* <!-- Estimated Time --> */}
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">
-              Estimated Time
-            </label>
-            <div className="flex items-center gap-4 bg-gray-50 p-4 rounded-xl">
-              <div className="flex items-center gap-2">
-                <input
-                  type="number"
-                  id="estimatedHours"
-                  name="estimatedHours"
-                  min="0"
-                  className="w-20 h-11 px-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-colors text-center"
-                  placeholder="0"
-                />
-                <span className="text-sm font-medium text-gray-600">hrs</span>
+            {/* <!-- Estimated Time --> */}
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
+                Estimated Time
+              </label>
+              <div className="flex items-center gap-4 bg-gray-50 p-4 rounded-xl">
+                <div className="flex items-center gap-2">
+                  <input
+                    type="number"
+                    id="estimatedHours"
+                    name="estimatedHours"
+                    min="0"
+                    className="w-20 h-11 px-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-colors text-center"
+                    placeholder="0"
+                    value={estimateHour}
+                    onChange={(e) => {
+                      setEstimateHour(Number(e.target.value))
+                    }}
+                  />
+                  <span className="text-sm font-medium text-gray-600">hrs</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="number"
+                    id="estimatedMinutes"
+                    name="estimatedMinutes"
+                    min="0"
+                    max="59"
+                    className="w-20 h-11 px-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-colors text-center"
+                    placeholder="0"
+                    value={estimateMinute}
+                    onChange={(e) => {
+                      setEstimateMinute(Number(e.target.value));
+                    }}
+                  />
+                  <span className="text-sm font-medium text-gray-600">mins</span>
+                </div>
               </div>
-              <div className="flex items-center gap-2">
-                <input
-                  type="number"
-                  id="estimatedMinutes"
-                  name="estimatedMinutes"
-                  min="0"
-                  max="59"
-                  className="w-20 h-11 px-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-colors text-center"
-                  placeholder="0"
-                />
-                <span className="text-sm font-medium text-gray-600">mins</span>
-              </div>
             </div>
           </div>
-        </div>
 
-        {/* <!-- Footer --> */}
-        <div className="sticky bottom-0 px-8 py-6 bg-white border-t border-gray-100">
-          <div className="flex items-center justify-end gap-3">
-            <div
-              
-              onClick={closeModal}
-              className="cursor-pointer px-6 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 focus:ring-2 focus:ring-brand-500/20 transition-colors"
-            >
-              Cancel
+          {/* <!-- Footer --> */}
+          <div className="sticky bottom-0 px-8 py-6 bg-white border-t border-gray-100">
+            <div className="flex items-center justify-end gap-3">
+              <div
+
+                onClick={closeModal}
+                className="cursor-pointer px-6 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 focus:ring-2 focus:ring-brand-500/20 transition-colors"
+              >
+                Cancel
+              </div>
+              <button
+                type="submit"
+                className="px-6 py-2.5 text-sm font-medium text-white bg-brand-500 border border-transparent rounded-xl hover:bg-brand-600 focus:ring-2 focus:ring-brand-500/20 transition-colors"
+
+              >
+                Create Task
+              </button>
             </div>
-            <button
-              type="submit"
-              className="px-6 py-2.5 text-sm font-medium text-white bg-brand-500 border border-transparent rounded-xl hover:bg-brand-600 focus:ring-2 focus:ring-brand-500/20 transition-colors"
-            >
-              Create Task
-            </button>
           </div>
-        </div>
-      </form>
+        </form>
+      </div>
     </div>
+
   );
 };
 

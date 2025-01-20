@@ -7,15 +7,52 @@ import SimpleCard from "@/components/card/simpleCard";
 import Filterbar from "@/components/Filterbar";
 import ProjectCreateModal from "@/components/modal/projectCreateModal";
 import ProjectDetailModal, { ProjectData } from "@/components/modal/projectDetailsModal";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function Projects() {
     const [index, setIndex] = useState(0);
-
     const [detailData, setDetailData] = useState<ProjectData | null>(null);
-
     const [createModal, setCreateModal] = useState(false);
     const [detailModal, setDetailModal] = useState(false);
+    const [clients, setClients] = useState([]);
+    const [users, setUsers] = useState([]);
+
+    useEffect(() => {
+        const fetchClients = async () => {
+            const response = await fetch("/api/client");
+            const data = await response.json();
+            const clientsArray = data.map((user: any) => {
+                const temp = {
+                    full_name: user.full_name,
+                    id: user.id,
+                }
+                return temp;
+            });
+
+
+            setClients(clientsArray);
+
+        };
+        const fetchUsers = async () => {
+            const response = await fetch("/api/user");
+            const data = await response.json();
+
+            const clientsArray = data.map((user: any) => {
+                const temp = {
+                    full_name: user.full_name,
+                    position: user.position,
+                    id: user.id
+                }
+                return temp;
+            });
+            console.log(clientsArray);
+            setUsers(clientsArray);
+        };
+
+        fetchClients();
+        fetchUsers();
+
+    }, []);
 
     const openNewProjectModal = () => {
         setCreateModal(true);
@@ -27,7 +64,6 @@ export default function Projects() {
 
     const openProjectDetails = (i: number, d: ProjectData) => {
         setDetailData(d);
-       
         setDetailModal(true);
     }
 
@@ -104,7 +140,7 @@ export default function Projects() {
             {
                 createModal ? (
                     <>
-                        <ProjectCreateModal closeEvent={closeNewProjectModal} />
+                        <ProjectCreateModal closeEvent={closeNewProjectModal} clients={clients} users={users} />
                         <div id="modalOverlay" className="active modal-overlay fixed w-screen h-screen inset-0 bg-black/50 backdrop-blur-sm z-50"
                             onClick={closeNewProjectModal}></div>
                     </>

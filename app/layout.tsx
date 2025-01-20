@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 // import { Inter } from "next/font/google";
 import './globals.css';
+import ClientWrapper from '@/components/common/ClientWrapper';
 
 // const inter = Inter({
 //   variable: "--font-inter",
@@ -24,7 +25,11 @@ export default function RootLayout({
         {/* <script src="/js/scripts.js" defer></script>
         <script src="/js/projectdetails.js" defer></script> */}
       </head>
-      <body className={`antialiased`}>{children}</body>
+      <body className={`antialiased`}>
+        <ClientWrapper>
+          {children}
+        </ClientWrapper>
+      </body>
     </html>
   );
 }
